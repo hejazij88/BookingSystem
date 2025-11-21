@@ -1,4 +1,6 @@
-﻿namespace BookingSystem.Domain.Models;
+﻿using BookingSystem.Domain.Enums;
+
+namespace BookingSystem.Domain.Models;
 
 public class Service:BaseEntity
 {
@@ -8,5 +10,5 @@ public class Service:BaseEntity
     public bool IsActive { get; set; } = true; // فعال/غیرفعال بودن خدمت
 
     // ارتباط با رزروها (یک خدمت می‌تواند چندین رزرو داشته باشد)
-    //public ICollection<Appointment>? Appointments { get; set; }
+    public ICollection<Appointment>? Appointments { get; set; }
 }
