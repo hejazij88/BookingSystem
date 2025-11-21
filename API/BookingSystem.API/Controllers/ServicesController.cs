@@ -1,4 +1,5 @@
 ﻿using BookingSystem.API.DTOs;
+using BookingSystem.API.Services;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +13,12 @@ namespace BookingSystem.API.Controllers
     public class ServicesController : ControllerBase
     {
         public readonly BookingDbContext _context;
+        private readonly AvailabilityService _availabilityService; 
 
-        public ServicesController(BookingDbContext context)
+        public ServicesController(BookingDbContext context, AvailabilityService availabilityService)
         {
             _context = context;
+            _availabilityService = availabilityService;
         }
 
         [HttpGet]
@@ -32,7 +35,13 @@ namespace BookingSystem.API.Controllers
             return Ok(services);
         }
 
-
+        [HttpGet("{id}/slots")]
+        public async Task<ActionResult<IEnumerable<TimeSlotDto>>> GetSlots(int id, [FromQuery] DateTime date)
+        {
+            // تاریخ اگر گذشته باشد، منطقا نباید سانس بدهد (این شرط را می‌توان بعدا افزود)
+            var slots = await _availabilityService.GenerateSlots(id, date);
+            return Ok(slots);
+        }
 
         [HttpPost]
         public async Task<ActionResult<ServiceDto>> CreateService(CreateServiceDto request)

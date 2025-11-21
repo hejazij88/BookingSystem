@@ -10,6 +10,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<BookingDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddScoped<BookingSystem.API.Services.AvailabilityService>();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
