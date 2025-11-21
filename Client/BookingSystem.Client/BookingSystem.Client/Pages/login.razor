@@ -1,0 +1,20 @@
+﻿@page "/login"
+@using BookingSystem.Client.Models
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavManager
+@inject ISnackbar Snackbar
+
+<MudCard Class="pa-4 mt-5 mx-auto" Style="max-width: 400px;">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" Class="mb-4">ورود به سیستم</MudText>
+
+        <MudTextField @bind-Value="model.Email" Label="ایمیل" Variant="Variant.Outlined" Class="mb-3" />
+        <MudTextField @bind-Value="model.Password" Label="رمز عبور" Variant="Variant.Outlined" InputType="InputType.Password" Class="mb-3" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="HandleLogin">
+            ورود
+        </MudButton>
+    </MudCardContent>
+</MudCard>
+
