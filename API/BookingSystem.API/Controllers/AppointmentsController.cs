@@ -1,14 +1,17 @@
 ﻿using BookingSystem.API.DTOs;
 using BookingSystem.Domain.Enums;
 using BookingSystem.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookingSystem.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AppointmentsController : ControllerBase
     {
         private readonly BookingDbContext _context;
@@ -23,6 +26,8 @@ namespace BookingSystem.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBooking(CreateAppointmentDto request)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             // 1. آیا سرویس وجود دارد؟
             var service = await _context.Services.FindAsync(request.ServiceId);
             if (service == null)
@@ -46,7 +51,7 @@ namespace BookingSystem.API.Controllers
             var appointment = new Appointment
             {
                 ServiceId = request.ServiceId,
-                UserId = request.UserId,
+                UserId = userId,
                 StartTime = request.StartTime,
                 EndTime = endTime,
                 Status = BookingStatus.Pending, // وضعیت اولیه: در انتظار تایید/پرداخت
