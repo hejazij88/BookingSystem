@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BookingSystem.Infrastructure.Data
 {
-    public class BookingDbContext:DbContext
+    public class BookingDbContext:IdentityDbContext<ApplicationUser>
     {
         public BookingDbContext(DbContextOptions<BookingDbContext> options) : base(options)
         {
