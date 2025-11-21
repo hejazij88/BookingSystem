@@ -8,6 +8,16 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorOrigin",
+        builder => builder
+            .AllowAnyOrigin() // در محیط واقعی باید آدرس دقیق سایت را بدهید
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 // خواندن ConnectionString از فایل تنظیمات
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
