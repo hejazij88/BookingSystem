@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingSystem.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingSystem.API", "API\BookingSystem.API\BookingSystem.API.csproj", "{401A34CE-AC20-49BF-B48F-6F2E9224D428}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingSystem.Client", "Client\BookingSystem.Client\BookingSystem.Client.csproj", "{2F79E024-9F84-427B-B361-04DCABAF9A23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{401A34CE-AC20-49BF-B48F-6F2E9224D428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{401A34CE-AC20-49BF-B48F-6F2E9224D428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{401A34CE-AC20-49BF-B48F-6F2E9224D428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F79E024-9F84-427B-B361-04DCABAF9A23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F79E024-9F84-427B-B361-04DCABAF9A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F79E024-9F84-427B-B361-04DCABAF9A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F79E024-9F84-427B-B361-04DCABAF9A23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -75,6 +75,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowBlazorOrigin");
+
 app.UseAuthentication(); // اول: کیستی؟
 app.UseAuthorization();  // دوم: اجازه داری؟
 app.MapControllers();
