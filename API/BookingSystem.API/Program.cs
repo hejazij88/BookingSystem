@@ -65,8 +65,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
+app.UseAuthentication(); // اول: کیستی؟
+app.UseAuthorization();  // دوم: اجازه داری؟
 app.MapControllers();
 
 app.Run();
