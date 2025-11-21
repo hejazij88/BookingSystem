@@ -1,4 +1,14 @@
+﻿using BookingSystem.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// خواندن ConnectionString از فایل تنظیمات
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// ثبت DbContext در سیستم تزریق وابستگی (DI)
+builder.Services.AddDbContext<BookingDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Add services to the container.
 
