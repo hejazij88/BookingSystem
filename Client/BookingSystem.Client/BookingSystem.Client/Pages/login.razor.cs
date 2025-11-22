@@ -4,7 +4,7 @@ using MudBlazor;
 
 namespace BookingSystem.Client.Pages;
 
-public partial class login
+public partial class Login
 {
     private LoginModel model = new LoginModel();
 
