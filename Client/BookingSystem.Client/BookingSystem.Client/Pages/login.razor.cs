@@ -27,6 +27,8 @@ public partial class login
                 // ذخیره توکن در مرورگر
                 await LocalStorage.SetItemAsync("authToken", result.Token);
 
+                await AuthStateProvider.GetAuthenticationStateAsync();
+
                 Snackbar.Add("ورود موفقیت آمیز بود!", Severity.Success);
                 NavManager.NavigateTo("/"); // هدایت به صفحه اصلی
             }

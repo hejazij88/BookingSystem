@@ -1,9 +1,11 @@
 ﻿@page "/login"
 @using BookingSystem.Client.Models
+@using Microsoft.AspNetCore.Components.Authorization
 @inject HttpClient Http
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudCard Class="pa-4 mt-5 mx-auto" Style="max-width: 400px;">
     <MudCardContent>
