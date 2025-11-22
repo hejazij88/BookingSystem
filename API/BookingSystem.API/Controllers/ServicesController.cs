@@ -1,7 +1,9 @@
 ﻿using BookingSystem.API.DTOs;
 using BookingSystem.API.Services;
+using BookingSystem.Domain.Constants;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +46,7 @@ namespace BookingSystem.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = ApplicationRoles.Admin)]
         public async Task<ActionResult<ServiceDto>> CreateService(CreateServiceDto request)
         {
             // تبدیل DTO ورودی به موجودیت دیتابیس

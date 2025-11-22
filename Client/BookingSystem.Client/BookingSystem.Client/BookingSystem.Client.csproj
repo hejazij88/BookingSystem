@@ -14,4 +14,8 @@
     <PackageReference Include="MudBlazor" Version="8.14.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Domain\BookingSystem.Domain\BookingSystem.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
