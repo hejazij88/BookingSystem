@@ -1,5 +1,5 @@
-﻿using BookingSystem.API.DTOs;
-using BookingSystem.API.Services;
+﻿using BookingSystem.API.Services;
+using BookingSystem.Applications.DTOs;
 using BookingSystem.Domain.Constants;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;

@@ -16,6 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Applications\BookingSystem.Applications\BookingSystem.Applications.csproj" />
+    <ProjectReference Include="..\..\Client\BookingSystem.Client\BookingSystem.Client\BookingSystem.Client.csproj" />
     <ProjectReference Include="..\..\Infrastructure\BookingSystem.Infrastructure\BookingSystem.Infrastructure.csproj" />
   </ItemGroup>
 

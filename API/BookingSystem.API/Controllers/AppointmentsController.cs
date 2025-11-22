@@ -1,11 +1,10 @@
-﻿using BookingSystem.API.DTOs;
-using BookingSystem.Domain.Enums;
+﻿using BookingSystem.Domain.Enums;
 using BookingSystem.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using BookingSystem.Applications.DTOs;
 
 namespace BookingSystem.API.Controllers
 {

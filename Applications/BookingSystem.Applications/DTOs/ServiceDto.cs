@@ -1,4 +1,4 @@
-﻿namespace BookingSystem.API.DTOs;
+﻿namespace BookingSystem.Applications.DTOs;
 
 public class ServiceDto
 {
