@@ -1,0 +1,70 @@
+﻿@page "/book"
+@attribute [Authorize] // فقط کاربران لاگین شده دسترسی دارند
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject NavigationManager NavManager
+
+@using BookingSystem.Client.Models
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Authorization
+
+<MudText Typo="Typo.h4" Class="mb-4">رزرو نوبت جدید</MudText>
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">انتخاب سرویس و تاریخ</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudSelect T="ServiceDto" Label="سرویس مورد نظر" @bind-Value="SelectedService" 
+                           ValueChanged="OnSelectionChanged" Clearable="true" Required="true">
+                    @foreach (var service in Services)
+                    {
+                        <MudSelectItem Value="service">@service.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                
+                <MudDatePicker Label="تاریخ نوبت" @bind-Date="SelectedDate" 
+                               MinDate="@DateTime.Today"
+                               ValueChanged="OnSelectionChanged" Class="mt-3" Required="true" />
+                
+                @if (SelectedService != null)
+                {
+                    <MudText Class="mt-3" Typo="Typo.subtitle2">
+                        مدت زمان: @SelectedService.DurationMinutes دقیقه
+                    </MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">انتخاب ساعت (سانس‌های خالی)</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (Slots.Any())
+                {
+                    <MudList Clickable="true" Dense="true">
+                        @foreach (var slot in Slots)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.AccessTime" OnClick="@(() => BookSlot(slot))">
+                                <span style="font-weight: bold;">@slot.DisplayTime</span> - @slot.EndTime.ToShortTimeString()
+                            </MudListItem>
+                        }
+                    </MudList>
+                }
+                else if (SelectedService != null && SelectedDate.HasValue)
+                {
+                    <MudAlert Severity="Severity.Info">وقت خالی در این تاریخ وجود ندارد.</MudAlert>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2">لطفا سرویس و تاریخ را انتخاب کنید تا زمان‌های خالی نمایش داده شوند.</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
