@@ -81,4 +81,19 @@ app.UseAuthentication(); // اول: کیستی؟
 app.UseAuthorization();  // دوم: اجازه داری؟
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // اجرای متد Seed (برای ساخت نقش‌ها و کاربر ادمین)
+        await IdentityInitializer.SeedRolesAndAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
 app.Run();
