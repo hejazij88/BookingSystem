@@ -15,8 +15,4 @@
     <ProjectReference Include="..\..\Infrastructure\BookingSystem.Infrastructure\BookingSystem.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Users\Commands\" />
-  </ItemGroup>
-
 </Project>
