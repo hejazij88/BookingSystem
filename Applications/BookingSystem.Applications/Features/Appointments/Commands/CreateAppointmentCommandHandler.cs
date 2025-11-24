@@ -1,9 +1,11 @@
 ﻿using BookingSystem.Applications.DTOs;
 using BookingSystem.Applications.Features.Appointments.Commands.Records;
+using BookingSystem.Applications.Hubs;
 using BookingSystem.Domain.Enums;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookingSystem.Applications.Features.Appointments.Commands;
@@ -11,10 +13,12 @@ namespace BookingSystem.Applications.Features.Appointments.Commands;
 public class CreateAppointmentCommandHandler: IRequestHandler<CreateAppointmentCommand, int>
 {
     private readonly BookingDbContext _context;
+    private readonly IHubContext<AppointmentHub> _hubContext;
 
-    public CreateAppointmentCommandHandler(BookingDbContext context)
+    public CreateAppointmentCommandHandler(BookingDbContext context, IHubContext<AppointmentHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     public async Task<int> Handle(CreateAppointmentCommand request, CancellationToken cancellationToken)
@@ -50,6 +54,18 @@ public class CreateAppointmentCommandHandler: IRequestHandler<CreateAppointmentC
         // 5. ذخیره
         _context.Appointments.Add(appointment);
         await _context.SaveChangesAsync(cancellationToken);
+
+        // اطلاع‌رسانی Real-Time
+        await _hubContext.Clients.All.SendAsync("ReceiveAppointment", new
+        {
+            appointment.Id,
+            appointment.UserId,
+            appointment.ServiceId,
+            appointment.StartTime,
+            appointment.EndTime,
+            appointment.Status
+        });
+
 
         return appointment.Id;
     }

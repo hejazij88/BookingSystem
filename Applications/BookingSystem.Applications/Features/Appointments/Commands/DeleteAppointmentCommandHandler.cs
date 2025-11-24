@@ -1,6 +1,8 @@
 ﻿using BookingSystem.Applications.Features.Appointments.Commands.Records;
+using BookingSystem.Applications.Hubs;
 using BookingSystem.Infrastructure.Data;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BookingSystem.Applications.Features.Appointments.Commands;
 
@@ -8,9 +10,13 @@ public class DeleteAppointmentCommandHandler : IRequestHandler<DeleteAppointment
 {
     private readonly BookingDbContext _context;
 
-    public DeleteAppointmentCommandHandler(BookingDbContext context)
+    private readonly IHubContext<AppointmentHub> _hubContext;
+
+
+    public DeleteAppointmentCommandHandler(BookingDbContext context, IHubContext<AppointmentHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     public async Task<Unit> Handle(DeleteAppointmentCommand request, CancellationToken cancellationToken)
@@ -21,6 +27,12 @@ public class DeleteAppointmentCommandHandler : IRequestHandler<DeleteAppointment
 
         _context.Appointments.Remove(appointment);
         await _context.SaveChangesAsync(cancellationToken);
+
+
+        await _hubContext.Clients.All.SendAsync("ReceiveAppointmentDeleted", new
+        {
+            appointment.StartTime
+        });
 
         return Unit.Value;
     }

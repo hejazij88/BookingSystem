@@ -1,5 +1,6 @@
 ﻿using BookingSystem.Applications.Behaviors;
 using BookingSystem.Applications.Features.Services.Queries;
+using BookingSystem.Applications.Hubs;
 using BookingSystem.Domain.Interfaces;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
@@ -21,8 +22,6 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetServicesQuery).Assembly);
 
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-
 
 
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
@@ -77,6 +76,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<BookingSystem.API.Services.AvailabilityService>();
 
+builder.Services.AddSignalR();
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -92,6 +94,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapHub<AppointmentHub>("/appointmentHub");
+
 
 app.UseCors("AllowBlazorOrigin");
 
