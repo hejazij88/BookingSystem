@@ -31,6 +31,15 @@
                                @bind-Date:after="OnSelectionChanged"
                                MinDate="@DateTime.Today"
                                Class="mt-3" Required="true" />
+
+                <MudSwitch T="bool" @bind-Checked="_payOnline" Color="Color.Primary" Class="mt-4">
+                    <ChildContent>
+                        <MudText Typo="Typo.body2">پرداخت آنلاین هنگام رزرو</MudText>
+                    </ChildContent>
+                </MudSwitch>
+                <MudText Typo="Typo.caption" Class="ml-4">
+                    در صورت انتخاب، پس از ثبت رزرو پرداخت شبیه‌سازی شده و وضعیت آن به «پرداخت شده» تغییر می‌کند.
+                </MudText>
                 
                 @if (SelectedService != null)
                 {
@@ -53,7 +62,10 @@
                     <MudList T="TimeSlotDto" Clickable="true" Dense="true">
                         @foreach (var slot in Slots)
                         {
-                            <MudListItem T="TimeSlotDto" Icon="@Icons.Material.Filled.AccessTime" OnClick="@(() => BookSlot(slot))">
+                            <MudListItem T="TimeSlotDto"
+                                         Icon="@Icons.Material.Filled.AccessTime"
+                                         Disabled="_isBooking"
+                                         OnClick="@(() => BookSlot(slot))">
                                 <span style="font-weight: bold;">@slot.DisplayTime</span> - @slot.EndTime.ToShortTimeString()
                             </MudListItem>
                         }
@@ -66,6 +78,48 @@
                 else
                 {
                     <MudText Typo="Typo.body2">لطفا سرویس و تاریخ را انتخاب کنید تا زمان‌های خالی نمایش داده شوند.</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">پرداخت</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (SelectedService != null)
+                {
+                    <MudText Typo="Typo.subtitle1" Class="mb-2">
+                        مبلغ سرویس: @SelectedService.Price.ToString("N0") تومان
+                    </MudText>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        برای مشاهده مبلغ، ابتدا سرویس را انتخاب کنید.
+                    </MudText>
+                }
+
+                <MudSwitch T="bool"
+                           @bind-Checked="_payOnline"
+                           Color="Color.Primary"
+                           Class="mt-2"
+                           Label="پرداخت آنلاین بلافاصله بعد از رزرو">
+                </MudSwitch>
+
+                @if (_payOnline)
+                {
+                    <MudAlert Severity="Severity.Info" Elevation="0" Class="mt-3">
+                        پس از تایید رزرو، پرداخت به‌صورت خودکار انجام می‌شود و کد رهگیری نمایش داده خواهد شد.
+                    </MudAlert>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Warning" Elevation="0" Class="mt-3">
+                        پرداخت آنلاین غیرفعال است. تسویه را در محل انجام دهید.
+                    </MudAlert>
                 }
             </MudCardContent>
         </MudCard>

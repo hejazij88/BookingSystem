@@ -40,6 +40,17 @@ namespace BookingSystem.Infrastructure.Data
                     .WithMany(s => s.Appointments)
                     .HasForeignKey(a => a.ServiceId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                e.Property(a => a.AmountPaid)
+                    .HasColumnType("decimal(18,2)")
+                    .HasDefaultValue(0m);
+
+                e.Property(a => a.Currency)
+                    .HasMaxLength(10)
+                    .HasDefaultValue("usd");
+
+                e.Property(a => a.PaymentReference)
+                    .HasMaxLength(255);
             });
 
             base.OnModelCreating(modelBuilder);

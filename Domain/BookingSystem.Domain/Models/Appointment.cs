@@ -19,4 +19,10 @@ public class Appointment:BaseEntity
 
     // یادداشت کاربر
     public string? Note { get; set; }
+
+    // پرداخت
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+    public string? PaymentReference { get; set; }
+    public decimal AmountPaid { get; set; }
+    public string Currency { get; set; } = "usd";
 }

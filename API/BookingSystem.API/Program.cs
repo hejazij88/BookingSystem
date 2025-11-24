@@ -1,6 +1,7 @@
 ﻿using BookingSystem.Applications.Behaviors;
 using BookingSystem.Applications.Features.Services.Queries;
 using BookingSystem.Applications.Hubs;
+using BookingSystem.Applications.Payments;
 using BookingSystem.Domain.Interfaces;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
@@ -77,6 +78,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<BookingSystem.API.Services.AvailabilityService>();
 
 builder.Services.AddSignalR();
+builder.Services.AddScoped<IPaymentGateway, FakePaymentGateway>();
 
 
 // Add services to the container.
