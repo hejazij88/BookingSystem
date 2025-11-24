@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using BookingSystem.Applications.DTOs;
+using BookingSystem.Domain.Models;
 
 namespace BookingSystem.API.Controllers
 {

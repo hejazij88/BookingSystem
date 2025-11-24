@@ -3,7 +3,6 @@
 public class Service:BaseEntity
 {
     public required string Name { get; set; } // نام خدمت: کارواش، اصلاح مو
-    public string? Category { get; set; }
     public int DurationMinutes { get; set; } // طول مدت انجام کار (مثلا 30 دقیقه)
     public decimal Price { get; set; } // قیمت
     public bool IsActive { get; set; } = true; // فعال/غیرفعال بودن خدمت
