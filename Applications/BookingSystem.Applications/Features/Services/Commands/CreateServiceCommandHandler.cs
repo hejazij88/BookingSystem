@@ -1,4 +1,5 @@
 ﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Domain.Interfaces;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
 using MediatR;
@@ -7,11 +8,11 @@ namespace BookingSystem.Applications.Features.Services.Commands;
 
 public class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand, ServiceDto>
 {
-    private readonly BookingDbContext _context;
+    private readonly IServiceRepository _serviceRepository;
 
-    public CreateServiceCommandHandler(BookingDbContext context)
+    public CreateServiceCommandHandler(IServiceRepository serviceRepository)
     {
-        _context = context;
+        _serviceRepository = serviceRepository;
     }
 
     public async Task<ServiceDto> Handle(CreateServiceCommand request, CancellationToken cancellationToken)
@@ -25,8 +26,8 @@ public class CreateServiceCommandHandler : IRequestHandler<CreateServiceCommand,
             IsActive = true
         };
 
-        _context.Services.Add(service);
-        await _context.SaveChangesAsync(cancellationToken);
+        await _serviceRepository.AddServiceAsync(service);
+        await _serviceRepository.SaveChangesAsync();
 
         // تبدیل Entity خروجی به DTO و برگرداندن
         return new ServiceDto

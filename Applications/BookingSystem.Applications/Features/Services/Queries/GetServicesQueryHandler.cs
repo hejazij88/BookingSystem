@@ -1,4 +1,5 @@
 ﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Domain.Interfaces;
 using BookingSystem.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -7,26 +8,26 @@ namespace BookingSystem.Applications.Features.Services.Queries;
 
 public class GetServicesQueryHandler : IRequestHandler<GetServicesQuery, List<ServiceDto>>
 {
-    private readonly BookingDbContext _context;
+    private readonly IServiceRepository _serviceRepository;
 
-    public GetServicesQueryHandler(BookingDbContext context)
+    public GetServicesQueryHandler(IServiceRepository serviceRepository)
     {
-        _context = context;
+        _serviceRepository = serviceRepository;
     }
 
     public async Task<List<ServiceDto>> Handle(GetServicesQuery request, CancellationToken cancellationToken)
     {
-        // منطق اصلی: کوئری به دیتابیس و تبدیل به DTO
-        var services = await _context.Services
-            .Select(s => new ServiceDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                DurationMinutes = s.DurationMinutes,
-                Price = s.Price
-            })
-            .ToListAsync(cancellationToken);
+        // منطق: استفاده از متد تعریف شده در Repository
+        var services = await _serviceRepository.GetAllServicesAsync();
 
-        return services;
+        // ... بقیه منطق تبدیل به DTO ...
+        // چون GetAllServicesAsync موجودیت‌ها را برمی‌گرداند، باید اینجا تبدیل به DTO شود
+        return services.Select(s => new ServiceDto
+        {
+            Id = s.Id,
+            Name = s.Name,
+            DurationMinutes = s.DurationMinutes,
+            Price = s.Price
+        }).ToList();
     }
 }

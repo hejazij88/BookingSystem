@@ -1,7 +1,9 @@
-﻿using BookingSystem.Domain.Models;
+﻿using BookingSystem.Applications.Features.Services.Queries;
+using BookingSystem.Domain.Interfaces;
+using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
+using BookingSystem.Infrastructure.Repositories;
 using MediatR;
-using BookingSystem.Applications.Features.Services.Queries;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddMediatR(typeof(GetServicesQuery).Assembly);
+
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
 builder.Services.AddCors(options =>
 {
