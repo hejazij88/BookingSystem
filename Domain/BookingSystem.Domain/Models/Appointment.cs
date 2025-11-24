@@ -14,8 +14,8 @@ public class Appointment:BaseEntity
     public int ServiceId { get; set; }
     public Service? Service { get; set; }
 
-    // شناسه کاربر (فعلا به صورت String نگه می‌داریم تا بعدا Identity را اضافه کنیم)
     public required string UserId { get; set; }
+    public ApplicationUser? User { get; set; }
 
     // یادداشت کاربر
     public string? Note { get; set; }
