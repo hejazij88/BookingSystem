@@ -1,6 +1,6 @@
-﻿using BookingSystem.Domain.Models;
+﻿using BookingSystem.Domain.Enums;
 
-namespace BookingSystem.Domain.Enums;
+namespace BookingSystem.Domain.Models;
 
 public class Appointment:BaseEntity
 {
