@@ -1,6 +1,7 @@
 ﻿using BookingSystem.Applications.Behaviors;
 using BookingSystem.Applications.Features.Services.Queries;
 using BookingSystem.Applications.Hubs;
+using BookingSystem.Applications.JWT;
 using BookingSystem.Applications.Payments;
 using BookingSystem.Domain.Interfaces;
 using BookingSystem.Domain.Models;
@@ -23,6 +24,11 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetServicesQuery).Assembly);
 
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
 
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
@@ -70,7 +76,7 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!))
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
         };
     });
 
