@@ -11,12 +11,39 @@
     <MudCardContent>
         <MudText Typo="Typo.h5" Class="mb-4">ورود به سیستم</MudText>
 
-        <MudTextField @bind-Value="model.Email" Label="ایمیل" Variant="Variant.Outlined" Class="mb-3" />
-        <MudTextField @bind-Value="model.Password" Label="رمز عبور" Variant="Variant.Outlined" InputType="InputType.Password" Class="mb-3" />
+        <MudForm @ref="_form">
+            <MudTextField @bind-Value="model.Email"
+                          For="@(() => model.Email)"
+                          Label="ایمیل"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          InputType="InputType.Email"
+                          Class="mb-3" />
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="HandleLogin">
-            ورود
-        </MudButton>
+            <MudTextField @bind-Value="model.Password"
+                          For="@(() => model.Password)"
+                          Label="رمز عبور"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          Required="true"
+                          Class="mb-3" />
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="_isSubmitting"
+                       OnClick="HandleLogin">
+                @if (_isSubmitting)
+                {
+                    <MudProgressCircular Size="Size.Small" Class="mr-2" />
+                    <span>در حال ورود...</span>
+                }
+                else
+                {
+                    <span>ورود</span>
+                }
+            </MudButton>
+        </MudForm>
     </MudCardContent>
 </MudCard>
 

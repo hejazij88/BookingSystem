@@ -1,0 +1,70 @@
+@page "/register"
+@using BookingSystem.Client.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavManager
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
+
+<MudCard Class="pa-4 mt-5 mx-auto" Style="max-width: 450px;">
+    <MudCardContent>
+        <MudText Typo="Typo.h5" Class="mb-4">ثبت‌نام کاربر جدید</MudText>
+        <MudForm @ref="_form">
+            <MudTextField @bind-Value="_model.FirstName"
+                          For="@(() => _model.FirstName)"
+                          Label="نام"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          Class="mb-3" />
+
+            <MudTextField @bind-Value="_model.LastName"
+                          For="@(() => _model.LastName)"
+                          Label="نام خانوادگی"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          Class="mb-3" />
+
+            <MudTextField @bind-Value="_model.Email"
+                          For="@(() => _model.Email)"
+                          Label="ایمیل"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          InputType="InputType.Email"
+                          Class="mb-3" />
+
+            <MudTextField @bind-Value="_model.Password"
+                          For="@(() => _model.Password)"
+                          Label="رمز عبور"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          Required="true"
+                          Class="mb-3" />
+
+            <MudTextField @bind-Value="_model.ConfirmPassword"
+                          For="@(() => _model.ConfirmPassword)"
+                          Label="تکرار رمز عبور"
+                          Variant="Variant.Outlined"
+                          InputType="InputType.Password"
+                          Required="true"
+                          Class="mb-3" />
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       FullWidth="true"
+                       Disabled="_isSubmitting"
+                       OnClick="HandleRegister">
+                @if (_isSubmitting)
+                {
+                    <MudProgressCircular Size="Size.Small" Class="mr-2" />
+                    <span>در حال ثبت...</span>
+                }
+                else
+                {
+                    <span>ثبت نام</span>
+                }
+            </MudButton>
+        </MudForm>
+    </MudCardContent>
+</MudCard>
+
