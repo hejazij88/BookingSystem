@@ -28,6 +28,11 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, string>
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Dto.Password, false);
         if (!result.Succeeded) throw new Exception("Invalid username or password");
 
+
+        var roles = await _userManager.GetRolesAsync(user);
+        user.Roles = roles;
+
+
         // ایجاد JWT
         var token = _jwtTokenGenerator.GenerateJwtToken(user);
         return token;

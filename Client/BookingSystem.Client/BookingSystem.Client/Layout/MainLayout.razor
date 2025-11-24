@@ -1,4 +1,5 @@
 ﻿@using BookingSystem.Domain.Constants
+@using BookingSystem.Domain.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 @inject ILocalStorageService LocalStorage
@@ -17,9 +18,15 @@
             <MudSpacer />
 
             <AuthorizeView>
-                <Authorized>
+
+                <Authorized Context="authContext">
                     <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/book" Class="mr-4">رزرو نوبت</MudButton>
-                    @if (context.User.IsInRole(ApplicationRoles.Admin))
+                    @if (authContext.User.IsInRole(ApplicationRoles.Admin))
+                    {
+                        var us = authContext.User;
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/admin" Class="mr-4">پنل مدیریت</MudButton>
+                    }
+                    else if (authContext.User.IsInRole(ApplicationRoles.Client))
                     {
                         <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/admin" Class="mr-4">پنل مدیریت</MudButton>
                     }

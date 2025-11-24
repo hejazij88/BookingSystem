@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Json;
-using BookingSystem.Client.Models;
+﻿using BookingSystem.Client.Models;
+using BookingSystem.Client.Services;
 using MudBlazor;
+using System.Net.Http.Json;
 
 namespace BookingSystem.Client.Pages;
 
@@ -49,7 +50,12 @@ public partial class Login
             }
 
             await LocalStorage.SetItemAsync("authToken", result.Token);
+
+
             await AuthStateProvider.GetAuthenticationStateAsync();
+
+
+            StateHasChanged();
 
             Snackbar.Add("ورود موفقیت آمیز بود!", Severity.Success);
             NavManager.NavigateTo("/");

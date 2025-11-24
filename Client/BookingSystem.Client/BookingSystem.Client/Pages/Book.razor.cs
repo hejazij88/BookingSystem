@@ -25,6 +25,7 @@ public partial class Book : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+
         SubscribeToRealtimeEvents();
         await EnsureRealtimeConnection();
         await LoadServices();
