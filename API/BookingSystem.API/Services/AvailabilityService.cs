@@ -1,4 +1,4 @@
-﻿using BookingSystem.API.DTOs;
+﻿using BookingSystem.Applications.DTOs;
 using BookingSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

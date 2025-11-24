@@ -1,12 +1,12 @@
-﻿using BookingSystem.API.DTOs;
+﻿using BookingSystem.Domain.Constants;
 using BookingSystem.Domain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BookingSystem.Applications.DTOs;
 
 namespace BookingSystem.API.Controllers
 {
@@ -37,10 +37,15 @@ namespace BookingSystem.API.Controllers
 
             var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            if (result.Succeeded)
+            {
+                // --- اضافه کردن این خط: ---
+                await _userManager.AddToRoleAsync(user, ApplicationRoles.Client);
+                // -------------------------
+                return Ok("ثبت نام با موفقیت انجام شد");
+            }
 
-            return Ok("ثبت نام با موفقیت انجام شد");
+            return BadRequest(result.Errors);
         }
 
         [HttpPost("login")]

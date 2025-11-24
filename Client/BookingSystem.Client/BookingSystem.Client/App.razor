@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <MudAlert Severity="Severity.Warning">شما دسترسی به این صفحه را ندارید. لطفا وارد شوید.</MudAlert>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <PageTitle>یافت نشد</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">متاسفانه این صفحه وجود ندارد.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

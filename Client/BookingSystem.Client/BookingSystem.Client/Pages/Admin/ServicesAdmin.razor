@@ -1,0 +1,144 @@
+﻿@page "/admin"
+@page "/admin/services"
+@attribute [Authorize(Roles = "Admin")] // فقط نقش ادمین می‌تواند این صفحه را ببیند
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@using BookingSystem.Client.Models 
+@using Microsoft.AspNetCore.Authorization
+
+<MudText Typo="Typo.h4" Class="mb-4">مدیریت سرویس‌ها</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddDialog" Class="mb-4">
+    <MudIcon Icon="@Icons.Material.Filled.Add" Class="ml-2" /> افزودن سرویس جدید
+</MudButton>
+
+@if (Services == null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+}
+else if (!Services.Any())
+{
+    <MudAlert Severity="Severity.Info">هنوز هیچ سرویسی تعریف نشده است.</MudAlert>
+}
+else
+{
+    <MudTable Items="@Services" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>شناسه</MudTh>
+            <MudTh>نام سرویس</MudTh>
+            <MudTh>مدت (دقیقه)</MudTh>
+            <MudTh>قیمت (تومان)</MudTh>
+            <MudTh>عملیات</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Duration">@context.DurationMinutes</MudTd>
+            <MudTd DataLabel="Price">@context.Price.ToString("N0")</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" 
+                               OnClick="@(() => DeleteService(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+<MudDialog @bind-IsVisible="isDialogOpen" Title="افزودن سرویس">
+    <DialogContent>
+        <MudTextField T="string" Label="نام سرویس" @bind-Value="newService.Name" Required="true" Class="mb-3" />
+        <MudNumericField T="int" Label="مدت زمان (دقیقه)" @bind-Value="newService.DurationMinutes" Required="true" Min="10" Max="300" Class="mb-3" />
+        <MudNumericField T="decimal" Label="قیمت (تومان)" @bind-Value="newService.Price" Required="true" Min="0" Class="mb-3" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDialog">لغو</MudButton>
+        <MudButton Color="Color.Primary" OnClick="SaveService">ذخیره</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<ServiceDto>? Services;
+    private ServiceDto newService = new();
+    private bool isDialogOpen = false;
+
+    // متد لود کردن داده
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadServices();
+    }
+
+    private async Task LoadServices()
+    {
+        try
+        {
+            // API call: GET api/services
+            Services = await Http.GetFromJsonAsync<List<ServiceDto>>("api/services");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"خطا در بارگذاری: {ex.Message}", Severity.Error);
+            Services = new List<ServiceDto>();
+        }
+    }
+
+    // باز کردن دیالوگ افزودن
+    private void OpenAddDialog()
+    {
+        newService = new ServiceDto(); // ریست کردن مدل
+        isDialogOpen = true;
+    }
+
+    private void CloseDialog()
+    {
+        isDialogOpen = false;
+    }
+
+    // ذخیره سرویس جدید
+    private async Task SaveService()
+    {
+        CloseDialog();
+
+        try
+        {
+            // API call: POST api/services
+            var response = await Http.PostAsJsonAsync("api/services", newService);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("سرویس با موفقیت افزوده شد!", Severity.Success);
+                await LoadServices(); // رفرش لیست
+            }
+            else
+            {
+                Snackbar.Add($"خطا: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"خطای سیستمی در ذخیره: {ex.Message}", Severity.Error);
+        }
+    }
+
+    // حذف سرویس
+    private async Task DeleteService(int id)
+    {
+        // باید حتماً تأییدیه بگیرید، اما برای سادگی فعلا مستقیم حذف می‌کنیم
+        try
+        {
+            // API call: DELETE api/services/{id}
+            var response = await Http.DeleteAsync($"api/services/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("سرویس حذف شد.", Severity.Warning);
+                await LoadServices(); // رفرش لیست
+            }
+            else
+            {
+                Snackbar.Add("خطا در حذف سرویس.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"خطای سیستمی: {ex.Message}", Severity.Error);
+        }
+    }
+}

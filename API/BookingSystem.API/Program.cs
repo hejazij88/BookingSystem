@@ -1,13 +1,31 @@
-﻿using System.Text;
+﻿using BookingSystem.Applications.Behaviors;
+using BookingSystem.Applications.Features.Services.Queries;
+using BookingSystem.Domain.Interfaces;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
+using BookingSystem.Infrastructure.Repositories;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddMediatR(typeof(GetServicesQuery).Assembly);
+
+builder.Services.AddValidatorsFromAssembly(typeof(GetServicesQuery).Assembly);
+
+
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+
+
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -80,5 +98,20 @@ app.UseCors("AllowBlazorOrigin");
 app.UseAuthentication(); // اول: کیستی؟
 app.UseAuthorization();  // دوم: اجازه داری؟
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // اجرای متد Seed (برای ساخت نقش‌ها و کاربر ادمین)
+        await IdentityInitializer.SeedRolesAndAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 app.Run();
