@@ -1,8 +1,11 @@
 ﻿using BookingSystem.API.Services;
 using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.Features.Services.Commands;
+using BookingSystem.Applications.Features.Services.Queries;
 using BookingSystem.Domain.Constants;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,27 +17,21 @@ namespace BookingSystem.API.Controllers
     [ApiController]
     public class ServicesController : ControllerBase
     {
-        public readonly BookingDbContext _context;
+        private readonly IMediator _mediator;
         private readonly AvailabilityService _availabilityService; 
 
-        public ServicesController(BookingDbContext context, AvailabilityService availabilityService)
+        public ServicesController(AvailabilityService availabilityService, IMediator mediator)
         {
-            _context = context;
             _availabilityService = availabilityService;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices() 
+        public async Task<ActionResult<IEnumerable<ServiceDto>>> GetServices()
         {
-            var services =await _context.Services.Select(s => new ServiceDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                DurationMinutes = s.DurationMinutes,
-                Price = s.Price,
-            }).ToListAsync();
-
-            return Ok(services);
+            // فقط درخواست را به لایه Application می‌فرستد و منتظر پاسخ می‌ماند
+            var result = await _mediator.Send(new GetServicesQuery());
+            return Ok(result);
         }
 
         [HttpGet("{id}/slots")]
@@ -47,32 +44,11 @@ namespace BookingSystem.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = ApplicationRoles.Admin)]
-        public async Task<ActionResult<ServiceDto>> CreateService(CreateServiceDto request)
+        public async Task<ActionResult<ServiceDto>> CreateService([FromBody] CreateServiceCommand command)
         {
-            // تبدیل DTO ورودی به موجودیت دیتابیس
-            var service = new Service
-            {
-                Name = request.Name,
-                DurationMinutes = request.DurationMinutes,
-                Price = request.Price,
-                IsActive = true
-            };
-
-            // اضافه کردن به دیتابیس
-            _context.Services.Add(service);
-            await _context.SaveChangesAsync(); // ذخیره نهایی (Commit)
-
-            // ساختن خروجی برای نمایش به کاربر
-            var response = new ServiceDto
-            {
-                Id = service.Id,
-                Name = service.Name,
-                DurationMinutes = service.DurationMinutes,
-                Price = service.Price
-            };
-
-            // برگرداندن کد 201 Created
-            return CreatedAtAction(nameof(GetServices), new { id = service.Id }, response);
+            // فقط دستور را می‌فرستد. Controller نمی‌داند چگونه این کار انجام می‌شود
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetServices), new { id = result.Id }, result);
         }
     }
 }

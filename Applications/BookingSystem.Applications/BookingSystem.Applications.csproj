@@ -10,4 +10,8 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\BookingSystem.Infrastructure\BookingSystem.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

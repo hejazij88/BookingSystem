@@ -1,13 +1,17 @@
-﻿using System.Text;
-using BookingSystem.Domain.Models;
+﻿using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
+using MediatR;
+using BookingSystem.Applications.Features.Services.Queries;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddMediatR(typeof(GetServicesQuery).Assembly);
 
 builder.Services.AddCors(options =>
 {
