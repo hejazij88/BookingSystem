@@ -11,6 +11,8 @@ public class AppointmentSignalRService
     private HubConnection? _hubConnection;
     private readonly SemaphoreSlim _connectionLock = new(1, 1);
 
+
+
     public event Action<AppointmentRealtimeDto>? OnAppointmentCreated;
     public event Action<AppointmentRealtimeDto>? OnAppointmentUpdated;
     public event Action<AppointmentRealtimeDto>? OnAppointmentDeleted;
@@ -22,8 +24,10 @@ public class AppointmentSignalRService
         {
             if (_hubConnection == null)
             {
+
+
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(navigation.ToAbsoluteUri("/appointmentHub"))
+                    .WithUrl(navigation.ToAbsoluteUri("https://localhost:7230/appointmentHub")) // پورت API
                     .WithAutomaticReconnect()
                     .Build();
 
