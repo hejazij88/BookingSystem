@@ -1,6 +1,6 @@
-﻿using BookingSystem.Domain.Models;
+﻿using BookingSystem.Domain.Enums;
 
-namespace BookingSystem.Domain.Enums;
+namespace BookingSystem.Domain.Models;
 
 public class Appointment:BaseEntity
 {
@@ -14,9 +14,15 @@ public class Appointment:BaseEntity
     public int ServiceId { get; set; }
     public Service? Service { get; set; }
 
-    // شناسه کاربر (فعلا به صورت String نگه می‌داریم تا بعدا Identity را اضافه کنیم)
     public required string UserId { get; set; }
+    public ApplicationUser? User { get; set; }
 
     // یادداشت کاربر
     public string? Note { get; set; }
+
+    // پرداخت
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+    public string? PaymentReference { get; set; }
+    public decimal AmountPaid { get; set; }
+    public string Currency { get; set; } = "usd";
 }

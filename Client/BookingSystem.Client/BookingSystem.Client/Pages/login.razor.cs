@@ -1,45 +1,72 @@
-﻿using System.Net.Http.Json;
-using BookingSystem.Client.Models;
+﻿using BookingSystem.Client.Models;
+using BookingSystem.Client.Services;
 using MudBlazor;
+using System.Net.Http.Json;
 
 namespace BookingSystem.Client.Pages;
 
 public partial class Login
 {
-    private LoginModel model = new LoginModel();
+    private readonly LoginModel model = new();
+    private MudForm? _form;
+    private bool _isSubmitting;
 
-    private class LoginResponse
+    private sealed class LoginResponse
     {
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
     }
 
     private async Task HandleLogin()
     {
+        if (_form is null)
+        {
+            return;
+        }
+
+        await _form.Validate();
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("لطفاً ایمیل و رمز عبور را به درستی وارد کنید.", Severity.Warning);
+            return;
+        }
+
+        _isSubmitting = true;
+
         try
         {
-            // ارسال درخواست به API
             var response = await Http.PostAsJsonAsync("api/Auth/login", model);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-
-                // ذخیره توکن در مرورگر
-                await LocalStorage.SetItemAsync("authToken", result.Token);
-
-                await AuthStateProvider.GetAuthenticationStateAsync();
-
-                Snackbar.Add("ورود موفقیت آمیز بود!", Severity.Success);
-                NavManager.NavigateTo("/"); // هدایت به صفحه اصلی
-            }
-            else
+            if (!response.IsSuccessStatusCode)
             {
                 Snackbar.Add("نام کاربری یا رمز عبور اشتباه است.", Severity.Error);
+                return;
             }
+
+            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            if (result == null || string.IsNullOrWhiteSpace(result.Token))
+            {
+                Snackbar.Add("توکن معتبر دریافت نشد.", Severity.Error);
+                return;
+            }
+
+            await LocalStorage.SetItemAsync("authToken", result.Token);
+
+
+            await AuthStateProvider.GetAuthenticationStateAsync();
+
+
+            StateHasChanged();
+
+            Snackbar.Add("ورود موفقیت آمیز بود!", Severity.Success);
+            NavManager.NavigateTo("/");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"خطا در ارتباط با سرور: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
         }
     }
 }

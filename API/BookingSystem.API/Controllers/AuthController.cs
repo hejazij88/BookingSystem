@@ -1,12 +1,9 @@
-﻿using BookingSystem.Domain.Constants;
-using BookingSystem.Domain.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.Features.Users.Commands;
+using BookingSystem.Applications.Features.Users.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using BookingSystem.Applications.DTOs;
 
 namespace BookingSystem.API.Controllers
 {
@@ -14,76 +11,67 @@ namespace BookingSystem.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
+        private readonly IMediator _mediator;
 
-
-        public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public AuthController(IMediator mediator)
         {
-            _userManager = userManager;
-            _configuration = configuration;
+            _mediator = mediator;
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto model)
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<UserDto>>> GetUsers()
         {
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
-            {
-                // --- اضافه کردن این خط: ---
-                await _userManager.AddToRoleAsync(user, ApplicationRoles.Client);
-                // -------------------------
-                return Ok("ثبت نام با موفقیت انجام شد");
-            }
-
-            return BadRequest(result.Errors);
+            var users = await _mediator.Send(new GetUsersQuery());
+            return Ok(users);
         }
 
+        // GET: api/Users/{id}
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<UserDto>> GetUserById(string id)
+        {
+            var user = await _mediator.Send(new GetUserByIdQuery(id));
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
+
+        // POST: api/Users
+        [HttpPost]
+        [AllowAnonymous] 
+        public async Task<ActionResult<UserDto>> CreateUser([FromBody] RegisterDto dto)
+        {
+            var user = await _mediator.Send(new CreateUserCommand(dto));
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+        }
+
+        // PUT: api/Users/{id}
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<UserDto>> UpdateUser(string id, [FromBody] UpdateUserDto dto)
+        {
+            if (id != dto.Id) return BadRequest("Id mismatch");
+            var user = await _mediator.Send(new UpdateUserCommand(dto));
+            return Ok(user);
+        }
+
+        // DELETE: api/Users/{id}
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            await _mediator.Send(new DeleteUserCommand(id));
+            return NoContent();
+        }
+
+        // POST: api/Users/login
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto model)
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> Login([FromBody] LoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Unauthorized("نام کاربری یا رمز عبور اشتباه است");
-
-            var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
-            if (!isPasswordValid) return Unauthorized("نام کاربری یا رمز عبور اشتباه است");
-
-            // تولید توکن
-            var token = GenerateJwtToken(user);
+            var token = await _mediator.Send(new LoginUserCommand(dto));
             return Ok(new { Token = token });
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.GivenName, user.FirstName)
-            };
-            
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using BookingSystem.Domain.Enums;
-
-namespace BookingSystem.Domain.Models;
+﻿namespace BookingSystem.Domain.Models;
 
 public class Service:BaseEntity
 {

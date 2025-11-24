@@ -1,43 +1,51 @@
 ﻿@using BookingSystem.Domain.Constants
+@using BookingSystem.Domain.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavManager
 @inject AuthenticationStateProvider AuthStateProvider
 
-<MudThemeProvider />
+<MudThemeProvider IsDarkMode="true" />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<MudPopoverProvider />
+<MudRTLProvider RightToLeft="true">
 
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h6">سیستم رزرواسیون</MudText>
-        <MudSpacer />
+    <MudLayout>
+        <MudAppBar Elevation="1">
+            <MudText Typo="Typo.h6">سیستم رزرواسیون</MudText>
+            <MudSpacer />
 
-        <AuthorizeView>
-            <Authorized>
-                <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/book" Class="mr-4">رزرو نوبت</MudButton>
-                <MudText Class="mr-4">سلام، @context.User.Identity.Name</MudText>
-                @if (context.User.IsInRole(ApplicationRoles.Admin))
-                {
-                    <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/admin" Class="mr-4">پنل مدیریت</MudButton>
-                }
-                <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="Logout">خروج</MudButton>
-            </Authorized>
-            <NotAuthorized>
-                <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/login">ورود</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/register">ثبت نام</MudButton>
-            </NotAuthorized>
-        </AuthorizeView>
+            <AuthorizeView>
 
-    </MudAppBar>
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
+                <Authorized Context="authContext">
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/book" Class="mr-4">رزرو نوبت</MudButton>
+                    @if (authContext.User.IsInRole(ApplicationRoles.Admin))
+                    {
+                        var us = authContext.User;
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/admin" Class="mr-4">پنل مدیریت</MudButton>
+                    }
+                    else if (authContext.User.IsInRole(ApplicationRoles.Client))
+                    {
+                        <MudButton Variant="Variant.Text" Color="Color.Secondary" Href="/userPanel" Class="mr-4">پنل مدیریت</MudButton>
+                    }
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" OnClick="Logout">خروج</MudButton>
+                </Authorized>
+                <NotAuthorized>
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/login">ورود</MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/register">ثبت نام</MudButton>
+                </NotAuthorized>
+            </AuthorizeView>
 
+        </MudAppBar>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</MudRTLProvider>
 @code {
     private async Task Logout()
     {
@@ -45,4 +53,8 @@
         await AuthStateProvider.GetAuthenticationStateAsync(); // رفرش وضعیت
         NavManager.NavigateTo("/login");
     }
+
+
+
+
 }
