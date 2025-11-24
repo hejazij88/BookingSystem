@@ -16,17 +16,21 @@
                 <MudText Typo="Typo.h6">انتخاب سرویس و تاریخ</MudText>
             </MudCardHeader>
             <MudCardContent>
-                <MudSelect T="ServiceDto" Label="سرویس مورد نظر" @bind-Value="SelectedService" 
-                           ValueChanged="OnSelectionChanged" Clearable="true" Required="true">
+                <MudSelect T="ServiceDto" Label="سرویس مورد نظر"
+                           @bind-Value="SelectedService"
+                           @bind-Value:after="OnSelectionChanged"
+                           Clearable="true" Required="true">
                     @foreach (var service in Services)
                     {
-                        <MudSelectItem Value="service">@service.Name</MudSelectItem>
+                        <MudSelectItem Value="@service">@service.Name</MudSelectItem>
                     }
                 </MudSelect>
                 
-                <MudDatePicker Label="تاریخ نوبت" @bind-Date="SelectedDate" 
+                <MudDatePicker Label="تاریخ نوبت"
+                               @bind-Date="SelectedDate"
+                               @bind-Date:after="OnSelectionChanged"
                                MinDate="@DateTime.Today"
-                               ValueChanged="OnSelectionChanged" Class="mt-3" Required="true" />
+                               Class="mt-3" Required="true" />
                 
                 @if (SelectedService != null)
                 {
@@ -46,10 +50,10 @@
             <MudCardContent>
                 @if (Slots.Any())
                 {
-                    <MudList Clickable="true" Dense="true">
+                    <MudList T="TimeSlotDto" Clickable="true" Dense="true">
                         @foreach (var slot in Slots)
                         {
-                            <MudListItem Icon="@Icons.Material.Filled.AccessTime" OnClick="@(() => BookSlot(slot))">
+                            <MudListItem T="TimeSlotDto" Icon="@Icons.Material.Filled.AccessTime" OnClick="@(() => BookSlot(slot))">
                                 <span style="font-weight: bold;">@slot.DisplayTime</span> - @slot.EndTime.ToShortTimeString()
                             </MudListItem>
                         }

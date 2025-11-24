@@ -1,5 +1,7 @@
-﻿using BookingSystem.Applications.Features.Appointments.Commands.Records;
+﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.Features.Appointments.Commands.Records;
 using BookingSystem.Applications.Hubs;
+using BookingSystem.Domain.Enums;
 using BookingSystem.Infrastructure.Data;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -25,14 +27,20 @@ public class DeleteAppointmentCommandHandler : IRequestHandler<DeleteAppointment
         if (appointment == null)
             throw new Exception("Appointment not found");
 
+        var notification = new AppointmentRealtimeDto
+        {
+            Id = appointment.Id,
+            ServiceId = appointment.ServiceId,
+            StartTime = appointment.StartTime,
+            EndTime = appointment.EndTime,
+            Status = BookingStatus.Cancelled
+        };
+
         _context.Appointments.Remove(appointment);
         await _context.SaveChangesAsync(cancellationToken);
 
 
-        await _hubContext.Clients.All.SendAsync("ReceiveAppointmentDeleted", new
-        {
-            appointment.StartTime
-        });
+        await _hubContext.Clients.All.SendAsync(AppointmentHub.AppointmentDeleted, notification, cancellationToken);
 
         return Unit.Value;
     }

@@ -1,4 +1,5 @@
 ﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.DTOs;
 using BookingSystem.Applications.Features.Appointments.Commands.Records;
 using BookingSystem.Applications.Hubs;
 using BookingSystem.Domain.Enums;
@@ -56,15 +57,16 @@ public class CreateAppointmentCommandHandler: IRequestHandler<CreateAppointmentC
         await _context.SaveChangesAsync(cancellationToken);
 
         // اطلاع‌رسانی Real-Time
-        await _hubContext.Clients.All.SendAsync("ReceiveAppointment", new
+        var notification = new AppointmentRealtimeDto
         {
-            appointment.Id,
-            appointment.UserId,
-            appointment.ServiceId,
-            appointment.StartTime,
-            appointment.EndTime,
-            appointment.Status
-        });
+            Id = appointment.Id,
+            ServiceId = appointment.ServiceId,
+            StartTime = appointment.StartTime,
+            EndTime = appointment.EndTime,
+            Status = appointment.Status
+        };
+
+        await _hubContext.Clients.All.SendAsync(AppointmentHub.AppointmentCreated, notification, cancellationToken);
 
 
         return appointment.Id;

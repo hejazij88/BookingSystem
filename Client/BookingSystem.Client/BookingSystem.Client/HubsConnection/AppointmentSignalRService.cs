@@ -1,40 +1,61 @@
 ﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.Hubs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Threading;
 
 namespace BookingSystem.Client.HubsConnection;
 
 public class AppointmentSignalRService
 {
     private HubConnection? _hubConnection;
+    private readonly SemaphoreSlim _connectionLock = new(1, 1);
 
-    public event Action<AppointmentDto>? OnAppointmentCreated;
-    public event Action<AppointmentDto>? OnAppointmentUpdated;
-    public event Action<int>? OnAppointmentDeleted;
+    public event Action<AppointmentRealtimeDto>? OnAppointmentCreated;
+    public event Action<AppointmentRealtimeDto>? OnAppointmentUpdated;
+    public event Action<AppointmentRealtimeDto>? OnAppointmentDeleted;
 
-    public async Task StartAsync(NavigationManager navigation)
+    public async Task EnsureConnectedAsync(NavigationManager navigation)
     {
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl(navigation.ToAbsoluteUri("/appointmentHub"))
-            .WithAutomaticReconnect()
-            .Build();
-
-        _hubConnection.On<AppointmentDto>("ReceiveAppointment", appointment =>
+        await _connectionLock.WaitAsync();
+        try
         {
-            OnAppointmentCreated?.Invoke(appointment);
-        });
+            if (_hubConnection == null)
+            {
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl(navigation.ToAbsoluteUri("/appointmentHub"))
+                    .WithAutomaticReconnect()
+                    .Build();
 
-        _hubConnection.On<AppointmentDto>("ReceiveAppointmentUpdated", appointment =>
+                RegisterHandlers();
+            }
+
+            if (_hubConnection.State == HubConnectionState.Disconnected)
+            {
+                await _hubConnection.StartAsync();
+            }
+        }
+        finally
         {
-            OnAppointmentUpdated?.Invoke(appointment);
-        });
+            _connectionLock.Release();
+        }
+    }
 
-        _hubConnection.On<int>("ReceiveAppointmentDeleted", appointmentId =>
+    private void RegisterHandlers()
+    {
+        if (_hubConnection == null)
         {
-            OnAppointmentDeleted?.Invoke(appointmentId);
-        });
+            return;
+        }
 
-        await _hubConnection.StartAsync();
+        _hubConnection.On<AppointmentRealtimeDto>(AppointmentHub.AppointmentCreated,
+            appointment => OnAppointmentCreated?.Invoke(appointment));
+
+        _hubConnection.On<AppointmentRealtimeDto>(AppointmentHub.AppointmentUpdated,
+            appointment => OnAppointmentUpdated?.Invoke(appointment));
+
+        _hubConnection.On<AppointmentRealtimeDto>(AppointmentHub.AppointmentDeleted,
+            appointment => OnAppointmentDeleted?.Invoke(appointment));
     }
 
     public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;

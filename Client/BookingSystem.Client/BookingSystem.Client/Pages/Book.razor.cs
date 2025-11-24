@@ -1,21 +1,68 @@
 ﻿using System.Net.Http.Json;
+using BookingSystem.Client.HubsConnection;
 using BookingSystem.Client.Models;
+using BookingSystem.Domain.Enums;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using AppointmentRealtimeDto = BookingSystem.Applications.DTOs.AppointmentRealtimeDto;
 
 namespace BookingSystem.Client.Pages;
 
-public partial class Book
+public partial class Book : IDisposable
 {
     private List<ServiceDto> Services = new();
     private List<TimeSlotDto> Slots = new();
     private ServiceDto? SelectedService { get; set; }
     private DateTime? SelectedDate { get; set; } = DateTime.Today.AddDays(1); // پیش فرض: فردا
     private bool IsLoading = false;
+    private bool _realtimeSubscribed;
+
+    [Inject] private AppointmentSignalRService AppointmentSignalRService { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
+        SubscribeToRealtimeEvents();
+        await EnsureRealtimeConnection();
         await LoadServices();
         await LoadAvailableSlots();
+    }
+
+    private void SubscribeToRealtimeEvents()
+    {
+        if (_realtimeSubscribed)
+        {
+            return;
+        }
+
+        AppointmentSignalRService.OnAppointmentCreated += HandleAppointmentChanged;
+        AppointmentSignalRService.OnAppointmentUpdated += HandleAppointmentChanged;
+        AppointmentSignalRService.OnAppointmentDeleted += HandleAppointmentChanged;
+        _realtimeSubscribed = true;
+    }
+
+    private void UnsubscribeFromRealtimeEvents()
+    {
+        if (!_realtimeSubscribed)
+        {
+            return;
+        }
+
+        AppointmentSignalRService.OnAppointmentCreated -= HandleAppointmentChanged;
+        AppointmentSignalRService.OnAppointmentUpdated -= HandleAppointmentChanged;
+        AppointmentSignalRService.OnAppointmentDeleted -= HandleAppointmentChanged;
+        _realtimeSubscribed = false;
+    }
+
+    private async Task EnsureRealtimeConnection()
+    {
+        try
+        {
+            await AppointmentSignalRService.EnsureConnectedAsync(NavManager);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"اتصال بلادرنگ برقرار نشد: {ex.Message}", Severity.Warning);
+        }
     }
 
     private async Task LoadServices()
@@ -99,5 +146,43 @@ public partial class Book
         {
             Snackbar.Add($"خطای سیستمی: {ex.Message}", Severity.Error);
         }
+    }
+
+    private void HandleAppointmentChanged(AppointmentRealtimeDto dto)
+    {
+        if (!ShouldRefreshSlots(dto))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await LoadAvailableSlots();
+
+            var message = dto.Status switch
+            {
+                BookingStatus.Cancelled => "یک نوبت آزاد شد. لیست سانس‌ها بروزرسانی شد.",
+                BookingStatus.Confirmed => "یک نوبت تایید شد. لیست سانس‌ها بروزرسانی شد.",
+                _ => "نوبت دیگری تغییر کرد. لیست سانس‌ها بروزرسانی شد."
+            };
+
+            Snackbar.Add(message, Severity.Info);
+        });
+    }
+
+    private bool ShouldRefreshSlots(AppointmentRealtimeDto dto)
+    {
+        if (SelectedService == null || !SelectedDate.HasValue)
+        {
+            return false;
+        }
+
+        return dto.ServiceId == SelectedService.Id &&
+               dto.StartTime.Date == SelectedDate.Value.Date;
+    }
+
+    public void Dispose()
+    {
+        UnsubscribeFromRealtimeEvents();
     }
 }

@@ -1,4 +1,5 @@
-﻿using BookingSystem.Applications.Features.Appointments.Commands.Records;
+﻿using BookingSystem.Applications.DTOs;
+using BookingSystem.Applications.Features.Appointments.Commands.Records;
 using BookingSystem.Applications.Hubs;
 using BookingSystem.Domain.Enums;
 using BookingSystem.Infrastructure.Data;
@@ -50,15 +51,16 @@ public class UpdateAppointmentCommandHandler : IRequestHandler<UpdateAppointment
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        await _hubContext.Clients.All.SendAsync("ReceiveAppointmentUpdated", new
+        var notification = new AppointmentRealtimeDto
         {
-            appointment.Id,
-            appointment.UserId,
-            appointment.ServiceId,
-            appointment.StartTime,
-            appointment.EndTime,
-            appointment.Status
-        });
+            Id = appointment.Id,
+            ServiceId = appointment.ServiceId,
+            StartTime = appointment.StartTime,
+            EndTime = appointment.EndTime,
+            Status = appointment.Status
+        };
+
+        await _hubContext.Clients.All.SendAsync(AppointmentHub.AppointmentUpdated, notification, cancellationToken);
 
         return appointment.Id;
     }
