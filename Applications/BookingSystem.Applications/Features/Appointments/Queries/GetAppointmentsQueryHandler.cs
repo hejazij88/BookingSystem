@@ -19,6 +19,7 @@ public class GetAppointmentsQueryHandler:IRequestHandler<GetAppointmentsQuery,Li
     {
         return await _context.Appointments
             .Include(a => a.User)
+            .Include(a=>a.Service)
             .Select(a => new AppointmentDto
             {
                 Id = a.Id,
@@ -26,7 +27,9 @@ public class GetAppointmentsQueryHandler:IRequestHandler<GetAppointmentsQuery,Li
                 UserName = a.User.UserName,
                 StartTime = a.StartTime,
                 EndTime = a.EndTime,
-                Description = a.Note
+                Description = a.Note,
+                Status = a.Status,
+                ServiceTitle = a.Service.Name
             }).ToListAsync(cancellationToken);
     }
 }

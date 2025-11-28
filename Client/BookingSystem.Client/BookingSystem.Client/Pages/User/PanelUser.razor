@@ -1,6 +1,11 @@
 ﻿@page "/userPanel"
+@using BookingSystem.Applications.DTOs
+@using BookingSystem.Domain.Enums
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize(Roles = "Client")]
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
 @inject ILocalStorageService LocalStorage
 
@@ -13,8 +18,8 @@
                 <MudItem xs="12" sm="6" md="4">
                     <MudCard>
                         <MudCardHeader>
-                            <MudText Typo="Typo.subtitle1">@booking.ServiceName</MudText>
-                            <MudText Typo="Typo.caption">@booking.Date.ToShortDateString() - @booking.Time</MudText>
+                            <MudText Typo="Typo.subtitle1">@booking.ServiceTitle</MudText>
+                            <MudText Typo="Typo.caption">@booking.StartTime.ToShortDateString()- @booking.EndTime</MudText>
                         </MudCardHeader>
                         <MudCardContent>
                             <MudText>وضعیت: @booking.Status</MudText>
@@ -37,8 +42,8 @@
                 <MudItem xs="12" sm="6" md="4">
                     <MudCard>
                         <MudCardHeader>
-                            <MudText Typo="Typo.subtitle1">@booking.ServiceName</MudText>
-                            <MudText Typo="Typo.caption">@booking.Date.ToShortDateString() - @booking.Time</MudText>
+                            <MudText Typo="Typo.subtitle1">@booking.ServiceTitle</MudText>
+                            <MudText Typo="Typo.caption">@booking.StartTime.ToShortDateString() - @booking.EndTime</MudText>
                         </MudCardHeader>
                         <MudCardContent>
                             <MudText>وضعیت: @booking.Status</MudText>
@@ -52,61 +57,3 @@
         </MudGrid>
     </MudTabPanel>
 </MudTabs>
-@code {
-    private int activeTab = 0;
-
-    private List<BookingDto> ActiveBookings = new List<BookingDto>();
-    private List<BookingDto> BookingHistory = new List<BookingDto>();
-
-    protected override async Task OnInitializedAsync()
-    {
-        // داده نمونه، بعداً از API دریافت شود
-        ActiveBookings = new List<BookingDto>
-        {
-            new BookingDto{ Id=1, ServiceName="خدمات A", Date=DateTime.Today, Time="10:00", Status="تایید شده" },
-            new BookingDto{ Id=2, ServiceName="خدمات B", Date=DateTime.Today.AddDays(1), Time="14:00", Status="در انتظار" },
-        };
-
-        BookingHistory = new List<BookingDto>
-        {
-            new BookingDto{ Id=3, ServiceName="خدمات C", Date=DateTime.Today.AddDays(-5), Time="09:00", Status="انجام شده" },
-        };
-    }
-
-    private void ViewBooking(int id)
-    {
-        NavManager.NavigateTo($"/user/bookings/{id}");
-    }
-
-    private void EditBooking(int id)
-    {
-        NavManager.NavigateTo($"/user/bookings/edit/{id}");
-    }
-
-    private void CancelBooking(int id)
-    {
-        // ⚡ اینجا می‌توانید درخواست API برای لغو رزرو ارسال کنید
-        var booking = ActiveBookings.FirstOrDefault(b => b.Id == id);
-        if (booking != null)
-        {
-            ActiveBookings.Remove(booking);
-            BookingHistory.Add(booking); // انتقال به تاریخچه با وضعیت لغو شده
-            booking.Status = "لغو شده";
-        }
-    }
-
-    private async Task Logout()
-    {
-        await LocalStorage.RemoveItemAsync("authToken");
-        NavManager.NavigateTo("/login");
-    }
-
-    public class BookingDto
-    {
-        public int Id { get; set; }
-        public string ServiceName { get; set; } = "";
-        public DateTime Date { get; set; }
-        public string Time { get; set; } = "";
-        public string Status { get; set; } = "";
-    }
-}

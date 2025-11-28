@@ -19,10 +19,13 @@ namespace BookingSystem.API.Controllers
     public class AppointmentsController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AppointmentsController(IMediator mediator)
+
+        public AppointmentsController(IMediator mediator, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -31,6 +34,15 @@ namespace BookingSystem.API.Controllers
             var list = await _mediator.Send(new GetAppointmentsQuery());
             return Ok(list);
         }
+
+        [HttpGet("GetAppointmentsByUserId")]
+        public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByUserId([FromQuery]bool isActive)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var list = await _mediator.Send(new GetAppointmentsByUserIdQuery(userId,isActive));
+            return Ok(list);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult<AppointmentDto>> CreateAppointment([FromBody] CreateAppointmentDto dto)
