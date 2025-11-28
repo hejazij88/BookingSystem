@@ -1,6 +1,7 @@
 ﻿using BookingSystem.Applications.DTOs;
 using BookingSystem.Applications.Features.Users.Commands;
 using BookingSystem.Applications.Features.Users.Queries;
+using BookingSystem.Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,18 @@ namespace BookingSystem.API.Controllers
         public AuthController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+
+        /// <summary>
+        /// دریافت Access Token جدید با Refresh Token
+        /// </summary>
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] string token)
+        {
+            var command = new RefreshTokenCommand(token);
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
 
         [HttpGet]
@@ -70,7 +83,12 @@ namespace BookingSystem.API.Controllers
         public async Task<ActionResult<string>> Login([FromBody] LoginDto dto)
         {
             var token = await _mediator.Send(new LoginUserCommand(dto));
-            return Ok(new { Token = token });
+            return Ok(new
+            {
+                AccessToken = token.AccessToken,
+                RefreshToken=token.RefreshToken,
+                AccessTokenExpiration=token.AccessTokenExpiration
+            });
         }
 
     }

@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize(Roles = "Client")]
-@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavManager
 @inject ILocalStorageService LocalStorage

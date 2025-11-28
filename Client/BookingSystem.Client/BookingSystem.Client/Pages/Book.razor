@@ -1,9 +1,11 @@
 ﻿@page "/book"
 @page "/"
 @attribute [Authorize] // فقط کاربران لاگین شده دسترسی دارند
-@inject HttpClient Http
 @inject ISnackbar Snackbar
 @inject NavigationManager NavManager
+@inject IHttpClientFactory ClientFactory
+
+
 
 @using BookingSystem.Client.Models
 @using System.Net.Http.Json

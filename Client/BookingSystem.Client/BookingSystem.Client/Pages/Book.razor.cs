@@ -11,6 +11,7 @@ namespace BookingSystem.Client.Pages;
 
 public partial class Book : IDisposable
 {
+    private HttpClient Http;
     private List<ServiceDto> Services = new();
     private List<TimeSlotDto> Slots = new();
     private ServiceDto? SelectedService { get; set; }
@@ -19,9 +20,15 @@ public partial class Book : IDisposable
     private bool _realtimeSubscribed;
     private bool _payOnline = true;
     private bool _isBooking;
-
+    
     [Inject] private AppointmentSignalRService AppointmentSignalRService { get; set; } = default!;
     [Inject] private PaymentApiService PaymentService { get; set; } = default!;
+
+
+    protected override void OnInitialized()
+    {
+        Http = ClientFactory.CreateClient("API");
+    }
 
     protected override async Task OnInitializedAsync()
     {

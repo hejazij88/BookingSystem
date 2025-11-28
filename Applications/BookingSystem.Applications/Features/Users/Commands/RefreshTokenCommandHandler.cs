@@ -11,7 +11,7 @@ namespace BookingSystem.Applications.Features.Users.Commands;
 public class RefreshTokenCommand : IRequest<LoginResponseDto>
 {
     public string Token { get; }
-    public RefreshTokenCommand(string token, string ipAddress)
+    public RefreshTokenCommand(string token)
     {
         Token = token;
     }
@@ -59,10 +59,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, L
         await _userManager.UpdateAsync(user);
 
         return new LoginResponseDto
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken.Token,
-            AccessTokenExpiration = refreshToken.Expires
-        };
+        (
+            
+            accessToken,
+            refreshToken.Token,
+            refreshToken.Expires
+        );
     }
 }

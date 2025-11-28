@@ -45,10 +45,10 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginRe
 
 
         return new LoginResponseDto
-        {
-            AccessToken = token,
-            RefreshToken = refreshToken.Token,
-            AccessTokenExpiration = refreshToken.Expires
-        };
+        (
+            token,
+            refreshToken.Token,
+            refreshToken.Expires
+        );
     }
 }

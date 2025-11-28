@@ -8,9 +8,15 @@ namespace BookingSystem.Client.Pages.User;
 
 public partial class PanelUser
 {
+    private HttpClient Http;
     private int activeTab = 0;
     private List<AppointmentDto>? ActiveBookings = new List<AppointmentDto>();
     private List<AppointmentDto>? BookingHistory = new List<AppointmentDto>();
+
+    protected override void OnInitialized()
+    {
+        Http = ClientFactory.CreateClient("API");
+    }
 
     protected override async Task OnInitializedAsync()
     {
