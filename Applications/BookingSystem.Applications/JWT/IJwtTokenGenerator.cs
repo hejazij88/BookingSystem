@@ -12,7 +12,7 @@ public interface IJwtTokenGenerator
 {
     Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(ApplicationUser user, string ipAddress);
     string GenerateJwtToken(ApplicationUser user);
-    RefreshToken GenerateRefreshToken(string ipAddress);
+    RefreshToken GenerateRefreshToken();
 
 }
 
@@ -30,7 +30,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public async Task<(string AccessToken, RefreshToken RefreshToken)> GenerateTokensAsync(ApplicationUser user, string ipAddress)
     {
         var accessToken = GenerateJwtToken(user);
-        var refreshToken = GenerateRefreshToken(ipAddress);
+        var refreshToken = GenerateRefreshToken();
         return (accessToken, refreshToken);
     }
 
@@ -65,7 +65,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public RefreshToken GenerateRefreshToken(string ipAddress)
+    public RefreshToken GenerateRefreshToken()
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
@@ -77,7 +77,6 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             Token = token,
             Expires = DateTime.UtcNow.AddDays(7),
             Created = DateTime.UtcNow,
-            CreatedByIp = ipAddress
         };
     }
 }
