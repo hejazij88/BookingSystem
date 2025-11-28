@@ -22,7 +22,7 @@ public class AuthService
         if (!response.IsSuccessStatusCode) return false;
 
         var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-        await _js.InvokeVoidAsync("localStorage.setItem", "accessToken", result.AccessToken);
+        await _js.InvokeVoidAsync("localStorage.setItem", "authToken", result.AccessToken);
         await _js.InvokeVoidAsync("localStorage.setItem", "refreshToken", result.RefreshToken);
 
         _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
@@ -38,7 +38,7 @@ public class AuthService
         if (!response.IsSuccessStatusCode) return false;
 
         var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-        await _js.InvokeVoidAsync("localStorage.setItem", "accessToken", result.AccessToken);
+        await _js.InvokeVoidAsync("localStorage.setItem", "authToken", result.AccessToken);
         await _js.InvokeVoidAsync("localStorage.setItem", "refreshToken", result.RefreshToken);
 
         _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);

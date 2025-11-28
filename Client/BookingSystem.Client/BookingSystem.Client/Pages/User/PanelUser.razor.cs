@@ -8,24 +8,20 @@ namespace BookingSystem.Client.Pages.User;
 
 public partial class PanelUser
 {
-    private HttpClient Http;
+    private HttpClient Http => ClientFactory.CreateClient("API");
     private int activeTab = 0;
     private List<AppointmentDto>? ActiveBookings = new List<AppointmentDto>();
     private List<AppointmentDto>? BookingHistory = new List<AppointmentDto>();
 
-    protected override void OnInitialized()
-    {
-        Http = ClientFactory.CreateClient("API");
-    }
+ 
 
     protected override async Task OnInitializedAsync()
     {
-        bool isActive = false;
 
         try
         {
             ActiveBookings = await Http.GetFromJsonAsync<List<AppointmentDto>>(
-                $"api/appointments/GetAppointmentsByUserId?isActive={isActive}");
+                "api/Appointments/GetAppointmentsByUserId?isActive=true");
         }
         catch (Exception ex)
         {
@@ -36,7 +32,7 @@ public partial class PanelUser
         try
         {
             BookingHistory = await Http.GetFromJsonAsync<List<AppointmentDto>>(
-                $"api/appointments/GetAppointmentsByUserId?isActive={isActive = false}");
+                "api/Appointments/GetAppointmentsByUserId?isActive=false"); 
         }
         catch (Exception ex)
         {

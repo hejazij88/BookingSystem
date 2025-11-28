@@ -2,6 +2,7 @@
 using BookingSystem.Applications.DTOs;
 using BookingSystem.Applications.Features.Appointments.Commands.Records;
 using BookingSystem.Applications.Features.Appointments.Queries.Records;
+using BookingSystem.Domain.Constants;
 using BookingSystem.Domain.Enums;
 using BookingSystem.Domain.Models;
 using BookingSystem.Infrastructure.Data;
@@ -38,11 +39,10 @@ namespace BookingSystem.API.Controllers
         [HttpGet("GetAppointmentsByUserId")]
         public async Task<ActionResult<List<AppointmentDto>>> GetAppointmentsByUserId([FromQuery]bool isActive)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId =_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var list = await _mediator.Send(new GetAppointmentsByUserIdQuery(userId,isActive));
             return Ok(list);
         }
-
 
         [HttpPost]
         public async Task<ActionResult<AppointmentDto>> CreateAppointment([FromBody] CreateAppointmentDto dto)

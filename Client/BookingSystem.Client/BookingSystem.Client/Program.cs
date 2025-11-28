@@ -11,15 +11,17 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<AuthMessageHandler>();
+
+
+
 
 builder.Services.AddHttpClient("API", client =>
     {
         client.BaseAddress = new Uri("https://localhost:7230/");
-    })
-    .AddHttpMessageHandler<AuthMessageHandler>();
+    }).AddHttpMessageHandler<AuthMessageHandler>();
 
+builder.Services.AddScoped<AuthMessageHandler>();
+builder.Services.AddScoped<AuthService>();
 
 
 builder.Services.AddSingleton<AppointmentSignalRService>();
