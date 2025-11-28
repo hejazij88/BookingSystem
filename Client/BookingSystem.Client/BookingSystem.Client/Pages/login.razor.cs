@@ -1,4 +1,5 @@
-﻿using BookingSystem.Client.Models;
+﻿using System.Net.Http.Headers;
+using BookingSystem.Client.Models;
 using BookingSystem.Client.Services;
 using MudBlazor;
 using System.Net.Http.Json;
@@ -7,13 +8,27 @@ namespace BookingSystem.Client.Pages;
 
 public partial class Login
 {
+    private HttpClient Http;
     private readonly LoginModel model = new();
     private MudForm? _form;
     private bool _isSubmitting;
 
+    public Login(HttpClient http)
+    {
+        Http = http;
+    }
+
+    protected override void OnInitialized()
+    {
+        Http = ClientFactory.CreateClient("API");
+    }
+
     private sealed class LoginResponse
     {
-        public string Token { get; set; } = string.Empty;
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime AccessTokenExpiration { get; set; }
+
     }
 
     private async Task HandleLogin()
@@ -43,17 +58,20 @@ public partial class Login
             }
 
             var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            if (result == null || string.IsNullOrWhiteSpace(result.Token))
+            if (result == null || string.IsNullOrWhiteSpace(result.AccessToken))
             {
                 Snackbar.Add("توکن معتبر دریافت نشد.", Severity.Error);
                 return;
             }
 
-            await LocalStorage.SetItemAsync("authToken", result.Token);
+            await LocalStorage.SetItemAsync("authToken", result.AccessToken);
+            await LocalStorage.SetItemAsync("refreshToken", result.RefreshToken);
+
 
 
             await AuthStateProvider.GetAuthenticationStateAsync();
 
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken); 
 
             StateHasChanged();
 

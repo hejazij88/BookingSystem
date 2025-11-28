@@ -25,6 +25,9 @@ builder.Services.AddValidatorsFromAssembly(typeof(GetServicesQuery).Assembly);
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
