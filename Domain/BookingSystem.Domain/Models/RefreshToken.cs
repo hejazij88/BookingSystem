@@ -9,6 +9,7 @@ public class RefreshToken
     public DateTime Created { get; set; } = DateTime.UtcNow;
     public string CreatedByIp { get; set; } = null!;
     public DateTime? Revoked { get; set; }
+    public bool IsRevoked => Revoked != null;
     public string? RevokedByIp { get; set; }
     public string? ReplacedByToken { get; set; }
 
