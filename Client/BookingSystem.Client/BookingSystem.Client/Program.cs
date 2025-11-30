@@ -12,23 +12,20 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
+builder.Services.AddBlazoredLocalStorage();
 
-
+builder.Services.AddScoped<AuthMessageHandler>();
 
 builder.Services.AddHttpClient("API", client =>
     {
         client.BaseAddress = new Uri("https://localhost:7230/");
     }).AddHttpMessageHandler<AuthMessageHandler>();
 
-builder.Services.AddScoped<AuthMessageHandler>();
-builder.Services.AddScoped<AuthService>();
-
 
 builder.Services.AddSingleton<AppointmentSignalRService>();
 builder.Services.AddScoped<PaymentApiService>();
 
 builder.Services.AddMudServices();
-builder.Services.AddBlazoredLocalStorage();
 
 
 builder.Services.AddAuthorizationCore(); // هسته اصلی Auth

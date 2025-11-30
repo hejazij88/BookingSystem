@@ -49,7 +49,7 @@
 @code {
     private async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync("authToken");
+        await LocalStorage.RemoveItemAsync("AccessToken");
         await AuthStateProvider.GetAuthenticationStateAsync(); // رفرش وضعیت
         NavManager.NavigateTo("/login");
     }

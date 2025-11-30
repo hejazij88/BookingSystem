@@ -33,16 +33,16 @@ builder.Services.Configure<JwtSettings>(
 
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
-
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorOrigin",
         builder => builder
-            .AllowAnyOrigin() // در محیط واقعی باید آدرس دقیق سایت را بدهید
+            .WithOrigins("https://localhost:7176","http://localhost:5012")
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());
 });
 
 // خواندن ConnectionString از فایل تنظیمات
@@ -78,10 +78,13 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            ClockSkew = TimeSpan.Zero,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
         };
     });
+
+builder.Services.AddAuthorization();
 
 
 builder.Services.AddScoped<BookingSystem.API.Services.AvailabilityService>();

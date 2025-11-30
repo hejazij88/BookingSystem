@@ -20,7 +20,7 @@ namespace BookingSystem.Client.Services
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             // 1. دریافت توکن از حافظه
-            string token = await _localStorage.GetItemAsStringAsync("authToken");
+            string token = await _localStorage.GetItemAsStringAsync("AccessToken");
 
             var identity = new ClaimsIdentity(); // یعنی کاربر ناشناس است
             _http.DefaultRequestHeaders.Authorization = null;
@@ -41,7 +41,7 @@ namespace BookingSystem.Client.Services
                 catch
                 {
                     // اگر توکن خراب بود، آن را پاک کن
-                    await _localStorage.RemoveItemAsync("authToken");
+                    await _localStorage.RemoveItemAsync("AccessToken");
                 }
             }
 

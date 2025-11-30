@@ -1,27 +1,29 @@
-﻿using BookingSystem.Applications.DTOs;
+﻿using Azure.Core;
+using BookingSystem.Applications.DTOs;
 using BookingSystem.Domain.Enums;
-using MudBlazor;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Severity = MudBlazor.Severity;
 
 namespace BookingSystem.Client.Pages.User;
 
 public partial class PanelUser
 {
-    private HttpClient Http => ClientFactory.CreateClient("API");
+    private HttpClient Http;
     private int activeTab = 0;
     private List<AppointmentDto>? ActiveBookings = new List<AppointmentDto>();
     private List<AppointmentDto>? BookingHistory = new List<AppointmentDto>();
 
- 
 
-    protected override async Task OnInitializedAsync()
+
+
+    protected async override Task OnInitializedAsync()
     {
+        Http = ClientFactory.CreateClient("API");
+
 
         try
         {
-            ActiveBookings = await Http.GetFromJsonAsync<List<AppointmentDto>>(
-                "api/Appointments/GetAppointmentsByUserId?isActive=true");
+            var response=await Http.GetFromJsonAsync<List<AppointmentDto>>("api/Appointments/GetAppointmentsByUserId?isActive=true");
         }
         catch (Exception ex)
         {
@@ -31,8 +33,8 @@ public partial class PanelUser
 
         try
         {
-            BookingHistory = await Http.GetFromJsonAsync<List<AppointmentDto>>(
-                "api/Appointments/GetAppointmentsByUserId?isActive=false"); 
+            //BookingHistory = Http.GetFromJsonAsync<List<AppointmentDto>>(
+            //    "api/Appointments/GetAppointmentsByUserId?isActive=false"); 
         }
         catch (Exception ex)
         {

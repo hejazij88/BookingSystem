@@ -64,14 +64,14 @@ public partial class Login
                 return;
             }
 
-            await LocalStorage.SetItemAsync("authToken", result.AccessToken);
+            await LocalStorage.SetItemAsync("AccessToken", result.AccessToken);
             await LocalStorage.SetItemAsync("refreshToken", result.RefreshToken);
 
 
 
             await AuthStateProvider.GetAuthenticationStateAsync();
 
-            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken); 
+            //Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken); 
 
             StateHasChanged();
 

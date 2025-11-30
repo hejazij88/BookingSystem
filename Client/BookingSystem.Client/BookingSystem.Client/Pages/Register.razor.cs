@@ -82,7 +82,7 @@ public partial class Register
             return;
         }
 
-        await LocalStorage.SetItemAsync("authToken", loginResult.Token);
+        await LocalStorage.SetItemAsync("AccessToken", loginResult.Token);
         await AuthStateProvider.GetAuthenticationStateAsync();
 
         Snackbar.Add("به سیستم خوش آمدید!", Severity.Success);
